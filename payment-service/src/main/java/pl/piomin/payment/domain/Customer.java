@@ -82,12 +82,12 @@ public class Customer {
         @Autowired
         private RabbitTemplate rabbitTemplate;
         
-        @RabbitListener(queuesToDeclare = @org.springframework.amqp.rabbit.annotation.Queue(name = "customer.created", durable = "true"))
+        @RabbitListener(queues = "customer.created")
         public void handleCustomerCreated(Object message) {
             // Process customer created message
         }
         
-        @RabbitListener(queuesToDeclare = @org.springframework.amqp.rabbit.annotation.Queue(name = "customer.updated", durable = "true"))
+        @RabbitListener(queues = "customer.updated")
         public void handleCustomerUpdated(Object message) {
             // Process customer updated message
         }

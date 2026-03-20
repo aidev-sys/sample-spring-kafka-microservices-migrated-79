@@ -1,8 +1,14 @@
-spring.application.name: payment
-spring.rabbitmq:
-  host: localhost
-  port: 5672
-  username: guest
-  password: guest
-spring.output.ansi.enabled: ALWAYS
-logging.pattern.console: "%clr(%d{HH:mm:ss.SSS}){blue} %clr(---){faint} %clr([%15.15t]){yellow} %clr(:){red} %clr(%m){faint}%n"
+spring:
+  application:
+    name: payment
+  rabbitmq:
+    host: localhost
+    port: 5672
+    username: guest
+    password: guest
+  output:
+    ansi:
+      enabled: ALWAYS
+logging:
+  pattern:
+    console: "%clr(%d{HH:mm:ss.SSS}){blue} %clr(---){faint} %clr([%15.15t]){yellow} %clr(:){red} %clr(%m){faint}%n"
