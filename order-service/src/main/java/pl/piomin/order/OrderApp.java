@@ -40,17 +40,17 @@ public class OrderApp {
         return new Queue("stock-orders", true);
     }
 
-    @RabbitListener(queuesToDeclare = @org.springframework.amqp.rabbit.annotation.Queue(name = "payment-orders", durable = "true"))
+    @RabbitListener(queues = "payment-orders")
     public void handlePaymentOrder(Order order) {
         // Handle payment order logic
     }
 
-    @RabbitListener(queuesToDeclare = @org.springframework.amqp.rabbit.annotation.Queue(name = "stock-orders", durable = "true"))
+    @RabbitListener(queues = "stock-orders")
     public void handleStockOrder(Order order) {
         // Handle stock order logic
     }
 
-    @RabbitListener(queuesToDeclare = @org.springframework.amqp.rabbit.annotation.Queue(name = "orders", durable = "true"))
+    @RabbitListener(queues = "orders")
     public void handleOrder(Order order) {
         // Handle final order logic
     }

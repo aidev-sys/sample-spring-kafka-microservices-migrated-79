@@ -41,7 +41,7 @@ public class OrderController {
         return true;
     }
 
-    @RabbitListener(queuesToDeclare = @org.springframework.amqp.rabbit.annotation.Queue(name = "orders", durable = "true"))
+    @RabbitListener(queues = "orders")
     public void listen(Order order) {
         LOG.info("Received: {}", order);
     }

@@ -75,9 +75,8 @@ public class Product {
         @Autowired
         private RabbitTemplate rabbitTemplate;
 
-        @RabbitListener(queuesToDeclare = @org.springframework.amqp.rabbit.annotation.Queue(name = "product.queue", durable = "true"))
+        @RabbitListener(queues = "product.queue")
         public void handleProductMessage(Object message) {
-            // Process the message
             System.out.println("Received message: " + message);
         }
 

@@ -31,7 +31,7 @@ public class PaymentApp {
     @Autowired
     OrderManageService orderManageService;
 
-    @RabbitListener(queuesToDeclare = @org.springframework.amqp.rabbit.annotation.Queue(name = "orders", durable = "true"))
+    @RabbitListener(queues = "orders")
     public void onEvent(Order o) {
         LOG.info("Received: {}", o);
         if (o.getStatus().equals("NEW"))

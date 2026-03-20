@@ -1,13 +1,41 @@
 package pl.piomin.base.domain;
 
+import jakarta.persistence.*;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import java.math.BigDecimal;
+import java.time.LocalDateTime;
+
+@Entity
+@Table(name = "orders")
 public class Order {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
+    @NotNull
     private Long customerId;
+
+    @NotNull
     private Long productId;
-    private int productCount;
-    private int price;
+
+    @NotNull
+    private Integer productCount;
+
+    @NotNull
+    private BigDecimal price;
+
+    @NotBlank
     private String status;
+
     private String source;
+
+    @Column(name = "created_at")
+    private LocalDateTime createdAt;
+
+    @Column(name = "updated_at")
+    private LocalDateTime updatedAt;
 
     public Order() {
     }
@@ -19,13 +47,24 @@ public class Order {
         this.status = status;
     }
 
-    public Order(Long id, Long customerId, Long productId, int productCount, int price) {
+    public Order(Long id, Long customerId, Long productId, Integer productCount, BigDecimal price) {
         this.id = id;
         this.customerId = customerId;
         this.productId = productId;
         this.productCount = productCount;
         this.price = price;
         this.status = "NEW";
+    }
+
+    @PrePersist
+    protected void onCreate() {
+        createdAt = LocalDateTime.now();
+        updatedAt = LocalDateTime.now();
+    }
+
+    @PreUpdate
+    protected void onUpdate() {
+        updatedAt = LocalDateTime.now();
     }
 
     public Long getId() {
@@ -68,20 +107,36 @@ public class Order {
         this.source = source;
     }
 
-    public int getProductCount() {
+    public Integer getProductCount() {
         return productCount;
     }
 
-    public void setProductCount(int productCount) {
+    public void setProductCount(Integer productCount) {
         this.productCount = productCount;
     }
 
-    public int getPrice() {
+    public BigDecimal getPrice() {
         return price;
     }
 
-    public void setPrice(int price) {
+    public void setPrice(BigDecimal price) {
         this.price = price;
+    }
+
+    public LocalDateTime getCreatedAt() {
+        return createdAt;
+    }
+
+    public void setCreatedAt(LocalDateTime createdAt) {
+        this.createdAt = createdAt;
+    }
+
+    public LocalDateTime getUpdatedAt() {
+        return updatedAt;
+    }
+
+    public void setUpdatedAt(LocalDateTime updatedAt) {
+        this.updatedAt = updatedAt;
     }
 
     @Override
@@ -94,6 +149,8 @@ public class Order {
                 ", price=" + price +
                 ", status='" + status + '\'' +
                 ", source='" + source + '\'' +
+                ", createdAt=" + createdAt +
+                ", updatedAt=" + updatedAt +
                 '}';
     }
 }
