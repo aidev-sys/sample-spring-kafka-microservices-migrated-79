@@ -1,4 +1,2 @@
-spring.rabbitmq.host=localhost
-spring.rabbitmq.port=5672
-spring.rabbitmq.username=guest
-spring.rabbitmq.password=guest
+// AI generation failed: HTTP 400 - {"error":{"code":"runtime_error","message":"I/O error on POST request for \"http://Qwen3-Coder-30B-A3B-Instruct-FP8/v1/chat/completions\": No route to host","param":null,"type":"runtime_error"}}
+// Request queued for retry.
