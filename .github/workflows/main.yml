@@ -1,0 +1,29 @@
+name: Java CI
+on: [workflow_dispatch]
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+    - name: Setup Java 21
+      uses: actions/setup-java@v4
+      with: {java-version: '21', distribution: 'temurin'}
+    - name: Build Validation
+      run: |
+          set -e
+          echo 'Building module: order-service'
+          cd order-service
+          mvn clean package -DskipTests
+          cd -
+          echo 'Building module: payment-service'
+          cd payment-service
+          mvn clean package -DskipTests
+          cd -
+          echo 'Building module: base-domain'
+          cd base-domain
+          mvn clean package -DskipTests
+          cd -
+          echo 'Building module: stock-service'
+          cd stock-service
+          mvn clean package -DskipTests
+          cd -

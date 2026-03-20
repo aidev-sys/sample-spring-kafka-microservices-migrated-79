@@ -1,6 +1,6 @@
 package pl.piomin.order.service;
 
-import org.springframework.kafka.core.KafkaTemplate;
+import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import pl.piomin.base.domain.Order;
@@ -15,9 +15,9 @@ public class OrderGeneratorService {
     private static Random RAND = new Random();
     private AtomicLong id = new AtomicLong();
     private Executor executor;
-    private KafkaTemplate<Long, Order> template;
+    private RabbitTemplate template;
 
-    public OrderGeneratorService(Executor executor, KafkaTemplate<Long, Order> template) {
+    public OrderGeneratorService(Executor executor, RabbitTemplate template) {
         this.executor = executor;
         this.template = template;
     }
@@ -29,7 +29,7 @@ public class OrderGeneratorService {
             Order o = new Order(id.incrementAndGet(), RAND.nextLong(100) + 1, RAND.nextLong(100) + 1, "NEW");
             o.setPrice(100 * x);
             o.setProductCount(x);
-            template.send("orders", o.getId(), o);
+            template.convertAndSend("orders", o);
         }
     }
 }

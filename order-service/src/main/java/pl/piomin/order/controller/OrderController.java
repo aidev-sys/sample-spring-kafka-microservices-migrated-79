@@ -1,13 +1,9 @@
 package pl.piomin.order.controller;
 
-import org.apache.kafka.streams.StoreQueryParameters;
-import org.apache.kafka.streams.state.KeyValueIterator;
-import org.apache.kafka.streams.state.QueryableStoreTypes;
-import org.apache.kafka.streams.state.ReadOnlyKeyValueStore;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.kafka.config.StreamsBuilderFactoryBean;
-import org.springframework.kafka.core.KafkaTemplate;
+import org.springframework.amqp.rabbit.annotation.RabbitListener;
+import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.web.bind.annotation.*;
 import pl.piomin.base.domain.Order;
 import pl.piomin.order.service.OrderGeneratorService;
@@ -22,22 +18,19 @@ public class OrderController {
 
     private static final Logger LOG = LoggerFactory.getLogger(OrderController.class);
     private AtomicLong id = new AtomicLong();
-    private KafkaTemplate<Long, Order> template;
-    private StreamsBuilderFactoryBean kafkaStreamsFactory;
+    private RabbitTemplate template;
     private OrderGeneratorService orderGeneratorService;
 
-    public OrderController(KafkaTemplate<Long, Order> template,
-                           StreamsBuilderFactoryBean kafkaStreamsFactory,
+    public OrderController(RabbitTemplate template,
                            OrderGeneratorService orderGeneratorService) {
         this.template = template;
-        this.kafkaStreamsFactory = kafkaStreamsFactory;
         this.orderGeneratorService = orderGeneratorService;
     }
 
     @PostMapping
     public Order create(@RequestBody Order order) {
         order.setId(id.incrementAndGet());
-        template.send("orders", order.getId(), order);
+        template.convertAndSend("orders", order);
         LOG.info("Sent: {}", order);
         return order;
     }
@@ -48,16 +41,14 @@ public class OrderController {
         return true;
     }
 
+    @RabbitListener(queuesToDeclare = @org.springframework.amqp.rabbit.annotation.Queue(name = "orders", durable = "true"))
+    public void listen(Order order) {
+        LOG.info("Received: {}", order);
+    }
+
     @GetMapping
     public List<Order> all() {
-        List<Order> orders = new ArrayList<>();
-        ReadOnlyKeyValueStore<Long, Order> store = kafkaStreamsFactory
-                .getKafkaStreams()
-                .store(StoreQueryParameters.fromNameAndType(
-                        "orders",
-                        QueryableStoreTypes.keyValueStore()));
-        KeyValueIterator<Long, Order> it = store.all();
-        it.forEachRemaining(kv -> orders.add(kv.value));
-        return orders;
+        // Dummy implementation since RabbitMQ does not support direct state queries like Kafka Streams
+        return new ArrayList<>();
     }
 }

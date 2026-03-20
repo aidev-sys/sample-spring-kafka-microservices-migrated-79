@@ -1,18 +1,27 @@
 package pl.piomin.payment.domain;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
+import org.springframework.amqp.rabbit.annotation.RabbitListener;
+import org.springframework.amqp.rabbit.core.RabbitTemplate;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
+
+import java.math.BigDecimal;
 
 @Entity
+@Table(name = "customer")
 public class Customer {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+    
     private String name;
+    
+    @Column(name = "amount_available")
     private int amountAvailable;
+    
+    @Column(name = "amount_reserved")
     private int amountReserved;
 
     public Customer() {
@@ -65,5 +74,30 @@ public class Customer {
                 ", amountAvailable=" + amountAvailable +
                 ", amountReserved=" + amountReserved +
                 '}';
+    }
+    
+    @Component
+    public static class CustomerMessageHandler {
+        
+        @Autowired
+        private RabbitTemplate rabbitTemplate;
+        
+        @RabbitListener(queuesToDeclare = @org.springframework.amqp.rabbit.annotation.Queue(name = "customer.created", durable = "true"))
+        public void handleCustomerCreated(Object message) {
+            // Process customer created message
+        }
+        
+        @RabbitListener(queuesToDeclare = @org.springframework.amqp.rabbit.annotation.Queue(name = "customer.updated", durable = "true"))
+        public void handleCustomerUpdated(Object message) {
+            // Process customer updated message
+        }
+        
+        public void sendCustomerCreated(Customer customer) {
+            rabbitTemplate.convertAndSend("customer.created", customer);
+        }
+        
+        public void sendCustomerUpdated(Customer customer) {
+            rabbitTemplate.convertAndSend("customer.updated", customer);
+        }
     }
 }

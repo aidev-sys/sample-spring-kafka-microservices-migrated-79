@@ -1,0 +1,47 @@
+---
+applications:
+- name: sample-spring-kafka-microservices-modernized-order-service
+  memory: 1G
+  instances: 1
+  buildpacks:
+    - java_buildpack
+  path: order-service/target/*.jar
+  env:
+    JBP_CONFIG_OPEN_JDK_JRE: '{ jre: { version: 21.+ } }'
+    SPRING_PROFILES_ACTIVE: cloud
+  services:
+    - modernized-rabbitmq
+
+- name: sample-spring-kafka-microservices-modernized-payment-service
+  memory: 1G
+  instances: 1
+  buildpacks:
+    - java_buildpack
+  path: payment-service/target/*.jar
+  env:
+    JBP_CONFIG_OPEN_JDK_JRE: '{ jre: { version: 21.+ } }'
+    SPRING_PROFILES_ACTIVE: cloud
+
+- name: sample-spring-kafka-microservices-modernized-base-domain
+  memory: 1G
+  instances: 1
+  buildpacks:
+    - java_buildpack
+  path: base-domain/target/*.jar
+  env:
+    JBP_CONFIG_OPEN_JDK_JRE: '{ jre: { version: 21.+ } }'
+    SPRING_PROFILES_ACTIVE: cloud
+
+- name: sample-spring-kafka-microservices-modernized-stock-service
+  memory: 1G
+  instances: 1
+  buildpacks:
+    - java_buildpack
+  path: stock-service/target/*.jar
+  env:
+    JBP_CONFIG_OPEN_JDK_JRE: '{ jre: { version: 21.+ } }'
+    SPRING_PROFILES_ACTIVE: cloud
+  services:
+    - modernized-postgres
+    - modernized-rabbitmq
+

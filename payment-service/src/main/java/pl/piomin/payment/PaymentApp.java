@@ -1,13 +1,17 @@
 package pl.piomin.payment;
 
 import jakarta.annotation.PostConstruct;
+import jakarta.persistence.*;
 import net.datafaker.Faker;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.amqp.core.Queue;
+import org.springframework.amqp.rabbit.annotation.RabbitListener;
+import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.kafka.annotation.KafkaListener;
+import org.springframework.context.annotation.Bean;
 import pl.piomin.base.domain.Order;
 import pl.piomin.payment.domain.Customer;
 import pl.piomin.payment.repository.CustomerRepository;
@@ -27,9 +31,9 @@ public class PaymentApp {
     @Autowired
     OrderManageService orderManageService;
 
-    @KafkaListener(id = "orders", topics = "orders", groupId = "payment")
+    @RabbitListener(queuesToDeclare = @org.springframework.amqp.rabbit.annotation.Queue(name = "orders", durable = "true"))
     public void onEvent(Order o) {
-        LOG.info("Received: {}" , o);
+        LOG.info("Received: {}", o);
         if (o.getStatus().equals("NEW"))
             orderManageService.reserve(o);
         else
@@ -48,5 +52,10 @@ public class PaymentApp {
             Customer c = new Customer(null, faker.name().fullName(), count, 0);
             repository.save(c);
         }
+    }
+
+    @Bean
+    public Queue ordersQueue() {
+        return new Queue("orders", true);
     }
 }

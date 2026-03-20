@@ -1,11 +1,13 @@
 package pl.piomin.stock.domain;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
+import org.springframework.amqp.rabbit.annotation.RabbitListener;
+import org.springframework.amqp.rabbit.core.RabbitTemplate;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 @Entity
+@Table(name = "product")
 public class Product {
 
     @Id
@@ -65,5 +67,22 @@ public class Product {
                 ", availableItems=" + availableItems +
                 ", reservedItems=" + reservedItems +
                 '}';
+    }
+
+    @Component
+    public static class ProductMessageHandler {
+
+        @Autowired
+        private RabbitTemplate rabbitTemplate;
+
+        @RabbitListener(queuesToDeclare = @org.springframework.amqp.rabbit.annotation.Queue(name = "product.queue", durable = "true"))
+        public void handleProductMessage(Object message) {
+            // Process the message
+            System.out.println("Received message: " + message);
+        }
+
+        public void sendProductMessage(Object message) {
+            rabbitTemplate.convertAndSend("product.queue", message);
+        }
     }
 }
